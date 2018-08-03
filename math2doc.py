@@ -1,11 +1,13 @@
 # coding:gb2312
 from __future__ import division
-from docx import Document
+from docx import Document, section
 import random
-import chardet
+# import chardet
+import time
 
 document = Document()
-
+timeid = str(time.strftime("%B %d, %Y at %H:%M", time.localtime(time.time())))
+ruldit=[]
 
 def mknum():
     q = random.choice([0.1, 10, 10, 10, 10, 10, 10, 100])
@@ -47,6 +49,7 @@ def mkone():
         if rulest > 0:
             if len(str(rulest)) <= 4:
                 print outstr + '=' + str(rulest)
+                ruldit.append(rulest)
                 break
 
     outstr = outstr.replace('+', u'＋')
@@ -60,16 +63,24 @@ def mkone():
 def mkdoc(page):
     for p in range(page):
         table = document.add_table(rows=25, cols=3)
-        for i in range(0, 25, 4):
+        hdr_cells = table.rows[0].cells
+        hdr_cells[0].text = timeid
+        hdr_cells[2].text = str(p)
+
+        for i in range(2, 25, 3):
             hdr_cells = table.rows[i].cells
             for j in range(3):
                 # print mkone()
                 hdr_cells[j].text = mkone()
-        if p != (page-1):
+        if p != (page - 1):
             document.add_page_break()
 
 
 if __name__ == '__main__':
-    n=raw_input('输入页数：')
+    n = raw_input('输入页数：')
     mkdoc(int(n))
     document.save('mathexample.docx')
+    f=open('allrul.txt','a+')
+    f.write(timeid+'\n')
+    f.write(' '.join(str(i) for i in ruldit)+'\n')
+    f.close()
